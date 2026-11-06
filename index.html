@@ -69,7 +69,7 @@ button, input { font: inherit; color: inherit; }
   <div id="stage"><div id="player"></div></div>
 
   <form id="add">
-    <input id="link" type="text" placeholder="YouTube link" aria-label="YouTube link" autocomplete="off">
+    <input id="link" type="text" placeholder="YouTube link or ID" aria-label="YouTube link or ID" autocomplete="off">
     <button id="add-button" type="submit">Add</button>
   </form>
 
@@ -100,8 +100,10 @@ function save() {
 }
 
 function videoId(text) {
+  text = text.trim();
+  if (/^[\w-]{11}$/.test(text)) return text;
   try {
-    const url = new URL(text.trim());
+    const url = new URL(text);
     const host = url.hostname.replace(/^www\./, "");
     let id = null;
     if (host === "youtu.be") id = url.pathname.slice(1);
@@ -169,7 +171,7 @@ $("add").addEventListener("submit", async (event) => {
   const links = $("link").value.split(/\s+/).filter(Boolean);
   const ids = links.map(videoId);
   if (!links.length) return;
-  if (ids.includes(null)) { say("Not a YouTube video link."); return; }
+  if (ids.includes(null)) { say("Not a YouTube link or video ID."); return; }
   const wasEmpty = items.length === 0;
   const added = ids.map((id) => ({ id, title: null }));
   items.push(...added);
